@@ -30,7 +30,7 @@ exit
 
 #Usuwanie wiadomości:
 #chroot /home exim -Mrm $id
-nice -n 19 ionice -c2 -n7 bash
+
 function mgrep { if test "${2: -3}" = ".gz"; then zgrep "$1" "$2"; else	grep "$1" "$2";	fi; }
 function clm { if [ "$#" -ge "1" ]; then chroot /home exim -bp | grep "$1" | tr ' ' '\n' | grep -E "\w{6}\-\w{6}\-\w{2}" |xargs chroot /home exim -Mrm; fi; }
 function maillog { mgrep $1 ${2:-/var/log/mail-php.log} | tail -n 20 | tr "[" " " | tr "(" " " | sed 's/  */ /g' | while read line; do echo $(echo $line | cut -d" " -f-3; echo $line | tr ' ' '\n' | grep .php; echo $line | tr ' ' '\n' | grep -A20 "To"); done; }
@@ -40,7 +40,7 @@ function mailip { mgrep $1 ${2:-/var/log/mail-php.log} | awk {'print $6'} | sort
 function mgrep { if test "${2: -3}" = ".gz"; then zgrep "$1" "$2"; else	grep "$1" "$2";	fi; }
 function blockDocRoot { if [ "$#" -ge "1" ]; then echo -e "\nAuthType Basic\nAuthName \"Strona zablokowana przez administratora\"\nAuthUserFile $1/.htpass\nRequire valid-user" >>$1/.htaccess; chattr +i $1/.htaccess; echo -e "\niq:\$apr1\$lDAtII43\$xHjAA6cMrC6cFXeZN0tDx1" >> $1/.htpass; fi; }
 function stat { echo -e "\n---------- STAT ----------\n $($(which stat) $1 | grep -ve "Birth\|Utworzenie")\n"; }
-function evalFinder { nice -n 19 ionice -c2 -n7 grep -rIE "eval\(.*\$" | sed 's/  */ /g' | sort -k2 | while read line; do echo -ne "$(echo "$line" | cut -d: -f1)\t"; echo $line | sed 's/^.*eval/eval/'; done | cut -c 1-200 | egrep --color=always "\b(eval|GLOBALS)\b|$" | less -R; }
+function evalFinder { nice -n 19 ionice -c2 -n7 grep -rIE "eval(\/\*.*\*\/\(|\().*\$" | sed 's/  */ /g' | sort -k2 | while read line; do echo -ne "$(echo "$line" | cut -d: -f1)\t"; echo $line | sed 's/^.*eval/eval/'; done | cut -c 1-200 | egrep --color=always "\b(eval|GLOBALS)\b|$" | less -R; }
 #wp grep wp_version wp-includes/version.php
 
 #grep sso-bhp_www /var/log/mail-php.log | grep 90.190.85.14 | cut -d: -f1 | uniq -c
