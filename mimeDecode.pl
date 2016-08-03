@@ -5,3 +5,6 @@ use Encode qw(decode);
 while (my $line = <STDIN>) {
         print decode("MIME-Header", $line);
         }
+
+
+#perl -CS -MEncode -ne 'print decode("MIME-Header", $_)'
